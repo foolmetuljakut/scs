@@ -8,19 +8,22 @@ namespace test::combat {
 TEST_CASE("Test Arena - hostile unit choice", "[require]") {
   auto arena = ArenaFactory::minimum_standard_arena();
 
-  REQUIRE(arena->choose_opponent(0) == 1);
-  REQUIRE(arena->choose_opponent(1) == 0);
+  auto dummy_parameters = std::make_shared<TestUnit>(0, 0);
+
+  REQUIRE(arena->choose_opponent(0, dummy_parameters) == 1);
+  REQUIRE(arena->choose_opponent(1, dummy_parameters) == 0);
 }
 
 TEST_CASE("Test Arena - failing hostile unit choice after desctruction",
           "[require]") {
   auto arena = ArenaFactory::minimum_standard_arena();
 
-  arena->update_tick(); // unit 0 destroys unit 1 -> removed from combat
-  // TODO in Arena::update_tick() -> distance currently 0, so if > 0, test
-  // expected to have to be fixed
+  auto dummy_parameters = std::make_shared<TestUnit>(0, 0);
+  arena->update_tick(); // unit 0 destroys unit 1 -> removed from combat. TestUnit ignores Distance
 
-  REQUIRE_THROWS(arena->choose_opponent(0));
+  REQUIRE_THROWS(arena->choose_opponent(0, dummy_parameters));
 }
+
+// TODO test with multiple ranked units of damage, use infinite stiffness and check if first unit is chosen over last
 
 }; // namespace test::combat

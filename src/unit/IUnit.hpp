@@ -1,5 +1,6 @@
 #pragma once
 #include "../std.hpp"
+#include "TargetPreference.hpp"
 
 namespace src::unit {
 
@@ -18,8 +19,10 @@ public:
 
   virtual size_t damage_normal(float distance) = 0;
   // later: explosives/splash/artillery, armor piercing / tank, ...
-
   virtual void apply_normal(size_t incoming_normal) = 0;
+
+  virtual TargetPreference preference() = 0;
+  virtual float preference_stiffness() = 0;
 };
 
 typedef std::shared_ptr<IUnit> UnitPtr;

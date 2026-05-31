@@ -6,6 +6,7 @@
 #include <random>
 #include <set>
 #include <vector>
+#include <functional>
 
 #include <libconfig.h++>
 #include <spdlog/spdlog.h>

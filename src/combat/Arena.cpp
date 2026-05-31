@@ -7,12 +7,12 @@ void Arena::update_tick() {
   auto unit_indices = create_index_list(units_involved.size());
   shuffle_index_list(unit_indices);
 
-  for (size_t unit_index : unit_indices) {
-    auto acting_unit = units_involved[unit_index];
+  for (size_t acting_unit_index : unit_indices) {
+    auto acting_unit = units_involved[acting_unit_index];
 
     size_t hostile_unit_index;
     try {
-      hostile_unit_index = choose_opponent(unit_index);
+      hostile_unit_index = choose_opponent(acting_unit_index, acting_unit);
     } catch (const std::runtime_error &) {
       return; // in case there are no opponents -> exception -> exit update
               // because only friendlies are present
@@ -33,22 +33,36 @@ void Arena::update_tick() {
                 [](src::unit::UnitPtr &unit) { return unit->alive() == 0; });
 }
 
-size_t Arena::choose_opponent(size_t unit_index) {
+size_t Arena::choose_opponent(size_t unit_index, const src::unit::UnitPtr& unit) {
 
   std::vector<size_t> indices = hostile_units_index_list(unit_index);
   if (indices.size() == 0) {
-
     throw std::runtime_error("no hostile combatants present");
   }
   if (indices.size() == 1) {
-
     return indices[0];
   }
 
-  std::uniform_int_distribution<size_t> dist(0, indices.size() - 1);
-  size_t choice = dist(rng);
-
+  auto sorted_indices = sort_units_by_preference(unit->preference(), indices);
+  size_t choice = src::generic::exponential_choice(indices, unit->preference_stiffness());
   return indices[choice];
+}
+
+std::vector<size_t> Arena::sort_units_by_preference(src::unit::TargetPreference pref, std::vector<size_t> unit_indices) {
+  // unit_indices passed intentionally by value to create a sorted copy
+
+  std::function<bool(const size_t&, const size_t&)> comp;
+  switch(pref) {
+    case src::unit::TargetPreference::Normal:
+    default:
+    // TODO replace close range approximation
+    comp = [&, pref](const size_t& a, const size_t& b) {
+      return units_involved[a]->damage_normal(0.0f) < units_involved[b]->damage_normal(0.0f);
+    };
+  }
+
+  std::sort(unit_indices.begin(), unit_indices.end(), comp);
+  return unit_indices;
 }
 
 void Arena::add_unit(const src::unit::UnitPtr &ptr) {

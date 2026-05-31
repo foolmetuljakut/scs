@@ -3,12 +3,15 @@
 
 #include "../unit/IUnit.hpp"
 
+#include "../generic/ExponentialChoice.hpp"
+
 namespace src::combat {
 
 class Arena {
 public:
   void update_tick();
-  size_t choose_opponent(size_t acting_unit);
+  size_t choose_opponent(size_t unit_index, const src::unit::UnitPtr& unit);
+  std::vector<size_t> sort_units_by_preference(src::unit::TargetPreference pref, std::vector<size_t> unit_indices);
 
   void add_unit(const src::unit::UnitPtr &ptr);
   void remove_unit(const src::unit::UnitPtr &ptr);

@@ -16,6 +16,8 @@ public:
   size_t wounded() override;
   size_t damage_normal(float distance) override;
   void apply_normal(size_t incoming_normal) override;
+  src::unit::TargetPreference preference() override;
+  float preference_stiffness() override;
 
 private:
   size_t _team_id, _unit_id, troops_total, troops_alive, troops_wounded,

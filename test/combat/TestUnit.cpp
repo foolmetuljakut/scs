@@ -32,4 +32,12 @@ void TestUnit::apply_normal(size_t incoming_normal) {
   troops_wounded += incoming_normal;
 }
 
+src::unit::TargetPreference TestUnit::preference() {
+  return src::unit::TargetPreference::Normal;
+}
+
+float TestUnit::preference_stiffness() {
+  return 0.1f;
+}
+
 }; // namespace test::combat
