@@ -1,3 +1,15 @@
+# Documentation directories
+html/
+latex/
+
+# Final product directory
+shipping/
+
+# Build directories
+build/
+Build/
+build-*/
+
 # Prerequisites
 *.d
 
@@ -38,11 +50,6 @@
 *.exe
 *.out
 *.app
-
-# Build directories
-build/
-Build/
-build-*/
 
 # CMake generated files
 CMakeFiles/

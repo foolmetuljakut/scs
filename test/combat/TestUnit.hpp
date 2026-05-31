@@ -1,0 +1,25 @@
+#pragma once
+#include "../../src/unit/IUnit.hpp"
+
+namespace test::combat {
+
+class TestUnit : public src::unit::IUnit {
+public:
+  TestUnit(size_t team_id, size_t unit_id);
+  ~TestUnit() override {}
+
+  size_t unit_id() override;
+  size_t team_id() override;
+  void reset() override;
+  size_t manpower() override;
+  size_t alive() override;
+  size_t wounded() override;
+  size_t damage_normal(float distance) override;
+  void apply_normal(size_t incoming_normal) override;
+
+private:
+  size_t _team_id, _unit_id, troops_total, troops_alive, troops_wounded,
+      base_damage_normal;
+};
+
+}; // namespace test::combat

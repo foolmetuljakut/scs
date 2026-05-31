@@ -1,0 +1,125 @@
+#include "Arena.hpp"
+
+namespace src::combat {
+
+void Arena::update_tick() {
+
+  auto unit_indices = create_index_list(units_involved.size());
+  shuffle_index_list(unit_indices);
+
+  for (size_t unit_index : unit_indices) {
+    auto acting_unit = units_involved[unit_index];
+
+    size_t hostile_unit_index;
+    try {
+      hostile_unit_index = choose_opponent(unit_index);
+    } catch (const std::runtime_error &) {
+      return; // in case there are no opponents -> exception -> exit update
+              // because only friendlies are present
+    }
+
+    src::unit::UnitPtr hostile_unit = units_involved[hostile_unit_index];
+
+    if (acting_unit->alive() == 0) {
+      continue;
+    }
+
+    // TODO find distance
+    float distance = 0;
+    hostile_unit->apply_normal(acting_unit->damage_normal(distance));
+  }
+
+  std::erase_if(units_involved,
+                [](src::unit::UnitPtr &unit) { return unit->alive() == 0; });
+}
+
+size_t Arena::choose_opponent(size_t unit_index) {
+
+  std::vector<size_t> indices = hostile_units_index_list(unit_index);
+  if (indices.size() == 0) {
+
+    throw std::runtime_error("no hostile combatants present");
+  }
+  if (indices.size() == 1) {
+
+    return indices[0];
+  }
+
+  std::uniform_int_distribution<size_t> dist(0, indices.size() - 1);
+  size_t choice = dist(rng);
+
+  return indices[choice];
+}
+
+void Arena::add_unit(const src::unit::UnitPtr &ptr) {
+  auto unit_it = std::find(units_involved.begin(), units_involved.end(), ptr);
+  if (unit_it == units_involved.end()) {
+    units_involved.push_back(ptr);
+  }
+}
+
+void Arena::remove_unit(const src::unit::UnitPtr &ptr) {
+  auto unit_it = std::find(units_involved.begin(), units_involved.end(), ptr);
+  if (unit_it == units_involved.end()) {
+    return;
+  }
+  units_involved.erase(unit_it);
+}
+
+void Arena::set_hostility(size_t team_a, size_t team_b) {
+  auto match = std::find(hostilities.begin(), hostilities.end(),
+                         std::pair{team_a, team_b});
+  if (match == hostilities.end()) {
+    hostilities.push_back({team_a, team_b});
+  }
+}
+
+void Arena::remove_hostility(size_t team_a, size_t team_b) {
+  auto match = std::find(hostilities.begin(), hostilities.end(),
+                         std::pair{team_a, team_b});
+  if (match != hostilities.end()) {
+    hostilities.erase(match);
+  }
+}
+
+size_t Arena::size() { return units_involved.size(); }
+
+std::vector<size_t> Arena::create_index_list(size_t n) {
+  std::vector<size_t> indices(n);
+  for (size_t i = 0; i < n; i++) {
+    indices[i] = i;
+  }
+  return indices;
+}
+
+void Arena::shuffle_index_list(std::vector<size_t> &index_list) {
+  auto rng = std::default_random_engine{};
+  std::shuffle(index_list.begin(), index_list.end(), rng);
+}
+
+bool Arena::are_hostile(size_t unit_index_a, size_t unit_index_b) {
+  size_t team_a = units_involved[unit_index_a]->team_id();
+  size_t team_b = units_involved[unit_index_b]->team_id();
+
+  bool found_a_b_hostility{std::find(hostilities.begin(), hostilities.end(),
+                                     std::pair{team_a, team_b}) !=
+                           hostilities.end()};
+  bool found_b_a_hostility{std::find(hostilities.begin(), hostilities.end(),
+                                     std::pair{team_b, team_a}) !=
+                           hostilities.end()};
+  return found_a_b_hostility || found_b_a_hostility;
+}
+
+std::vector<size_t> Arena::hostile_units_index_list(size_t acting_unit_index) {
+  size_t n = units_involved.size();
+  std::vector<size_t> indices;
+  indices.reserve(n);
+  for (size_t other_unit_index = 0; other_unit_index < n; other_unit_index++) {
+    if (are_hostile(acting_unit_index, other_unit_index)) {
+      indices.push_back(other_unit_index);
+    }
+  }
+  return indices;
+}
+
+}; // namespace src::combat
