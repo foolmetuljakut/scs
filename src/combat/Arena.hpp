@@ -3,18 +3,29 @@
 
 #include "../unit/IUnit.hpp"
 
-#include "../generic/ExponentialChoice.hpp"
+#include "../generic/MaxChoice.hpp"
 
 namespace src::combat {
+
+// TODO
+//  - extract unit preference sorting responsibility
+//    - leave for later
+//  - extract choice responsibility
+//    - make it simple: std::max_element with lambda [&units](auto& a, auto&b){
+//    return a < b; }
+//  - build new team-based unit collection responsibility
+//    - using team-split lists of units / temporary calculation tables
+//    - (vector of alives, vector of normal dmgs, ... so vectoring by stat
+//    instead of unit-specific encapsulation)
 
 class Arena {
 public:
   void update_tick();
-  size_t choose_opponent(size_t unit_index, const src::unit::UnitPtr& unit);
-  std::vector<size_t> sort_units_by_preference(src::unit::TargetPreference pref, std::vector<size_t> unit_indices);
+  size_t choose_opponent(size_t unit_index);
 
   void add_unit(const src::unit::UnitPtr &ptr);
   void remove_unit(const src::unit::UnitPtr &ptr);
+  bool unit_involved(const src::unit::UnitPtr &ptr);
   void set_hostility(size_t team_a, size_t team_b);
   void remove_hostility(size_t team_a, size_t team_b);
   size_t size();

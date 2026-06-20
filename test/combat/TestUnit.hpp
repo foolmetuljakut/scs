@@ -19,7 +19,7 @@ public:
   src::unit::TargetPreference preference() override;
   float preference_stiffness() override;
 
-private:
+protected:
   size_t _team_id, _unit_id, troops_total, troops_alive, troops_wounded,
       base_damage_normal;
 };

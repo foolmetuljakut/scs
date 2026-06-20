@@ -12,7 +12,7 @@ void Arena::update_tick() {
 
     size_t hostile_unit_index;
     try {
-      hostile_unit_index = choose_opponent(acting_unit_index, acting_unit);
+      hostile_unit_index = choose_opponent(acting_unit_index);
     } catch (const std::runtime_error &) {
       return; // in case there are no opponents -> exception -> exit update
               // because only friendlies are present
@@ -33,7 +33,7 @@ void Arena::update_tick() {
                 [](src::unit::UnitPtr &unit) { return unit->alive() == 0; });
 }
 
-size_t Arena::choose_opponent(size_t unit_index, const src::unit::UnitPtr& unit) {
+size_t Arena::choose_opponent(size_t unit_index) {
 
   std::vector<size_t> indices = hostile_units_index_list(unit_index);
   if (indices.size() == 0) {
@@ -43,26 +43,20 @@ size_t Arena::choose_opponent(size_t unit_index, const src::unit::UnitPtr& unit)
     return indices[0];
   }
 
-  auto sorted_indices = sort_units_by_preference(unit->preference(), indices);
-  size_t choice = src::generic::exponential_choice(indices, unit->preference_stiffness());
-  return indices[choice];
-}
+  src::unit::TargetPreference pref = units_involved[unit_index]->preference();
+  std::function<bool(const size_t &, const size_t &)> comp;
 
-std::vector<size_t> Arena::sort_units_by_preference(src::unit::TargetPreference pref, std::vector<size_t> unit_indices) {
-  // unit_indices passed intentionally by value to create a sorted copy
-
-  std::function<bool(const size_t&, const size_t&)> comp;
-  switch(pref) {
-    case src::unit::TargetPreference::Normal:
-    default:
-    // TODO replace close range approximation
-    comp = [&, pref](const size_t& a, const size_t& b) {
-      return units_involved[a]->damage_normal(0.0f) < units_involved[b]->damage_normal(0.0f);
+  switch (pref) {
+  case src::unit::TargetPreference::Normal:
+  default:
+    // TODO replace close range approximation (0.0f)
+    comp = [&, pref](const size_t &a, const size_t &b) {
+      return units_involved[a]->damage_normal(0.0f) <
+             units_involved[b]->damage_normal(0.0f);
     };
   }
 
-  std::sort(unit_indices.begin(), unit_indices.end(), comp);
-  return unit_indices;
+  return src::generic::max_choice(indices, comp);
 }
 
 void Arena::add_unit(const src::unit::UnitPtr &ptr) {
@@ -78,6 +72,11 @@ void Arena::remove_unit(const src::unit::UnitPtr &ptr) {
     return;
   }
   units_involved.erase(unit_it);
+}
+
+bool Arena::unit_involved(const src::unit::UnitPtr &ptr) {
+  return std::find(units_involved.begin(), units_involved.end(), ptr) !=
+         units_involved.end();
 }
 
 void Arena::set_hostility(size_t team_a, size_t team_b) {

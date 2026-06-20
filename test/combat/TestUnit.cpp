@@ -36,8 +36,6 @@ src::unit::TargetPreference TestUnit::preference() {
   return src::unit::TargetPreference::Normal;
 }
 
-float TestUnit::preference_stiffness() {
-  return 0.1f;
-}
+float TestUnit::preference_stiffness() { return 0.1f; }
 
 }; // namespace test::combat
