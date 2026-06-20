@@ -20,17 +20,23 @@ void Arena::update_tick() {
 
     src::unit::UnitPtr hostile_unit = units_involved[hostile_unit_index];
 
-    if (acting_unit->alive() == 0) {
+    if (unit_incapacitated(acting_unit)) {
       continue;
     }
 
     // TODO find distance
     float distance = 0;
-    hostile_unit->apply_normal(acting_unit->damage_normal(distance));
+    float damage_normal = acting_unit->damage_normal(distance);
+
+    if (damage_normal > 0) {
+      hostile_unit->apply_normal(damage_normal);
+      hostile_unit->apply_morale_damage(damage_normal);
+    }
   }
 
-  std::erase_if(units_involved,
-                [](src::unit::UnitPtr &unit) { return unit->alive() == 0; });
+  std::erase_if(units_involved, [this](src::unit::UnitPtr &unit) {
+    return unit_incapacitated(unit);
+  });
 }
 
 size_t Arena::choose_opponent(size_t unit_index) {
@@ -79,6 +85,10 @@ bool Arena::unit_involved(const src::unit::UnitPtr &ptr) {
          units_involved.end();
 }
 
+bool Arena::unit_incapacitated(const src::unit::UnitPtr &unit) {
+  return unit->alive() == 0 || unit->morale() == 0;
+}
+
 void Arena::set_hostility(size_t team_a, size_t team_b) {
   auto match = std::find(hostilities.begin(), hostilities.end(),
                          std::pair{team_a, team_b});
@@ -96,6 +106,10 @@ void Arena::remove_hostility(size_t team_a, size_t team_b) {
 }
 
 size_t Arena::size() { return units_involved.size(); }
+
+src::unit::UnitPtr Arena::get_involved_unit(size_t index) {
+  return units_involved[index];
+}
 
 std::vector<size_t> Arena::create_index_list(size_t n) {
   std::vector<size_t> indices(n);

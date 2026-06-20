@@ -3,8 +3,8 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "build & test",
-            "command": "pipeline configure_cmake && pipeline execute_build && pipeline run_unit_tests"
+            "label": "build",
+            "command": "pipeline configure_cmake && pipeline execute_build"
         }
     ]
 }

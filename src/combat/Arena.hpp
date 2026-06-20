@@ -26,9 +26,11 @@ public:
   void add_unit(const src::unit::UnitPtr &ptr);
   void remove_unit(const src::unit::UnitPtr &ptr);
   bool unit_involved(const src::unit::UnitPtr &ptr);
+  bool unit_incapacitated(const src::unit::UnitPtr &ptr);
   void set_hostility(size_t team_a, size_t team_b);
   void remove_hostility(size_t team_a, size_t team_b);
   size_t size();
+  src::unit::UnitPtr get_involved_unit(size_t index);
 
 private:
   std::vector<src::unit::UnitPtr> units_involved;

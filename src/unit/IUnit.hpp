@@ -17,6 +17,10 @@ public:
   virtual size_t alive() = 0;
   virtual size_t wounded() = 0;
 
+  virtual size_t morale() = 0;
+  virtual size_t total_morale() = 0;
+  virtual void apply_morale_damage(size_t incoming_damage) = 0;
+
   virtual size_t damage_normal(float distance) = 0;
   // later: explosives/splash/artillery, armor piercing / tank, ...
   virtual void apply_normal(size_t incoming_normal) = 0;

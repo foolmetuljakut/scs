@@ -16,7 +16,7 @@ TEST_CASE("Test Arena - failing hostile unit choice after desctruction",
           "[require]") {
   auto arena = ArenaFactory::minimum_standard_arena();
 
-  arena->update_tick(); // unit 0 destroys unit 1 -> removed from combat.
+  arena->update_tick(); // one unit destroys the other -> removed from combat.
                         // TestUnit ignores Distance
   REQUIRE(arena->size() == 1);
 
@@ -35,14 +35,31 @@ TEST_CASE("Test Arena - test picking one of multiple units", "[require]") {
 TEST_CASE("Test Arena - test targeting unit of highest value", "[require]") {
   auto arena = ArenaFactory::standard_arena_1v3();
 
-  arena->update_tick(); // unit 0 attacks unit 1-3 -> removed from combat.
-                        // TestUnit ignores Distance
+  auto destroyed_representative = arena->get_involved_unit(0);
+  arena->update_tick(); // unit 0 vs unit 1-3 -> the single unit will definitely
+                        // be incapacitated after an update
 
-  auto destroyed_representative = std::make_shared<TestUnit>(0, 1);
   REQUIRE(!arena->unit_involved(destroyed_representative));
 }
 
-// TODO test with multiple ranked units of damage, use infinite stiffness and
-// check if first unit is chosen over last
+TEST_CASE("Test Arena - victory by demoralization", "[require]") {
+  auto arena = ArenaFactory::demoralizing_1v1();
+
+  // we know _one_ unit will lose, just not which one
+  auto unit_a = arena->get_involved_unit(
+      0); // can do damage, but won't receive any -> will survive capable
+  auto unit_b =
+      arena->get_involved_unit(1); // can't do damage, but will receive enough
+                                   // to break morale -> will be incapacitated
+
+  arena->update_tick(); // one unit destroys the other -> removed from combat.
+  REQUIRE(arena->size() == 1);
+
+  bool one_unit_lost{arena->unit_incapacitated(unit_a) !=
+                     arena->unit_incapacitated(unit_b)};
+  REQUIRE(one_unit_lost);
+  REQUIRE(unit_a->alive() > 0);
+  REQUIRE(unit_b->alive() > 0);
+}
 
 }; // namespace test::combat

@@ -25,6 +25,10 @@ public:
     base_damage_normal = set;
     return *this;
   }
+  ConfigurableTestUnit &set_base_morale(size_t set) {
+    _total_morale = set;
+    return *this;
+  }
 };
 
 }; // namespace test::combat
