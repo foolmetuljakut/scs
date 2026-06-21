@@ -1,0 +1,3 @@
+# disable all installed libs
+leak:/lib64/
+leak:/usr/lib64/

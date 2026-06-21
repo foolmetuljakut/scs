@@ -25,6 +25,7 @@ public:
 
   void add_unit(const src::unit::UnitPtr &ptr);
   void remove_unit(const src::unit::UnitPtr &ptr);
+  void clear();
   bool unit_involved(const src::unit::UnitPtr &ptr);
   bool unit_incapacitated(const src::unit::UnitPtr &ptr);
   void set_hostility(size_t team_a, size_t team_b);

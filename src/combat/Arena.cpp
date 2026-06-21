@@ -80,6 +80,10 @@ void Arena::remove_unit(const src::unit::UnitPtr &ptr) {
   units_involved.erase(unit_it);
 }
 
+void Arena::clear() {
+  units_involved.clear();
+}
+
 bool Arena::unit_involved(const src::unit::UnitPtr &ptr) {
   return std::find(units_involved.begin(), units_involved.end(), ptr) !=
          units_involved.end();
