@@ -11,6 +11,7 @@ public:
   static src::combat::ArenaPtr minimum_standard_arena();
   static src::combat::ArenaPtr standard_arena_1v3();
   static src::combat::ArenaPtr demoralizing_1v1();
+  static src::combat::ArenaPtr partial_cover_arena(int cover);
 };
 
 }; // namespace test::combat

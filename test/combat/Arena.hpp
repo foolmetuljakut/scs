@@ -62,4 +62,66 @@ TEST_CASE("Test Arena - victory by demoralization", "[require]") {
   REQUIRE(unit_b->alive() > 0);
 }
 
+// TODO write tests for edge cases:
+//  2x2 grid of units completely covered / uncovered and 
+//                    incoming damage insufficient / sufficient to hit all uncovered
+
+TEST_CASE("Test Arena - cover - insufficient to hit uncovered (1/4)", "[require]") {
+  // low damage scenario:
+  // units are 1000 strong, cover for 1100 available 
+  // => any attack (1000alive*1dmg) is not sufficient to overcome cover
+  // => insufficient to hit (any) uncovered
+  auto arena = ArenaFactory::partial_cover_arena(1100);
+
+  auto unit_a = arena->get_involved_unit(0), unit_b = arena->get_involved_unit(1);
+  float damage = unit_a->damage_normal(0.f);
+  arena->apply_damage(unit_b, damage);
+
+  REQUIRE(unit_b->alive() == 756);
+}
+
+TEST_CASE("Test Arena - cover - sufficient to hit uncovered (2/4)", "[require]") {
+  // low mid damage scenario:
+  // units are 1000 strong, cover for 900 available 
+  // => any attack (1000alive*1dmg) is sufficient to overcome cover
+  // => sufficient to hit (any) uncovered
+  auto arena = ArenaFactory::partial_cover_arena(900);
+
+  auto unit_a = arena->get_involved_unit(0), unit_b = arena->get_involved_unit(1);
+  float damage = unit_a->damage_normal(0.f);
+  arena->apply_damage(unit_b, damage);
+
+  REQUIRE(unit_b->alive() == 681);
+}
+
+TEST_CASE("Test Arena - cover - insufficient to hit all covered (3/4)", "[require]") {
+  // high mid damage scenario:
+  // units are 1000 strong and do increased damage, full cover available
+  // => any attack (1000alive*4dmg) is almost sufficient to overcome cover
+  // => insufficient to hit (all) covered
+  auto arena = ArenaFactory::partial_cover_arena(1000);
+
+  auto unit_a = arena->get_involved_unit(0), unit_b = arena->get_involved_unit(1);
+  std::dynamic_pointer_cast<src::unit::Unit>(unit_a)->base_damage(4); // weird upcast to set base damage: IUnit -> Unit
+  float damage = unit_a->damage_normal(0.f);
+  arena->apply_damage(unit_b, damage);
+
+  REQUIRE(unit_b->alive() == 24);
+}
+
+TEST_CASE("Test Arena - cover - sufficient to hit all covered (4/4)", "[require]") {
+  // high damage scenario:
+  // units are 1000 strong and do increased damage, no full cover available
+  // => any attack (1000alive*4dmg) is almost sufficient to overcome cover
+  // => insufficient to hit (all) covered
+  auto arena = ArenaFactory::partial_cover_arena(900);
+
+  auto unit_a = arena->get_involved_unit(0), unit_b = arena->get_involved_unit(1);
+  std::dynamic_pointer_cast<src::unit::Unit>(unit_a)->base_damage(4); // weird upcast to set base damage: IUnit -> Unit
+  float damage = unit_a->damage_normal(0.f);
+  arena->apply_damage(unit_b, damage);
+
+  REQUIRE(unit_b->alive() == 0);
+}
+
 }; // namespace test::combat

@@ -1,8 +1,7 @@
 #pragma once
 #include "../../src/std.hpp"
-
-#include "ConfigurableTestUnit.hpp"
-#include "TestUnit.hpp"
+#include "../../src/unit/IUnit.hpp"
+#include "../../src/unit/Unit.hpp"
 
 namespace test::combat {
 

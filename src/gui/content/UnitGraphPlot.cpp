@@ -71,7 +71,7 @@ void UnitGraphPlot::detailed_unit_config() {
     ImGui::InputInt("Troops alive", &_create_unit_template._troops_alive);
     ImGui::InputInt("Troops wounded", &_create_unit_template._troops_wounded);
     ImGui::InputInt("Morale pts", &_create_unit_template._morale);
-    ImGui::InputInt("Base dmg / troop", &_create_unit_template._base_damage_normal);
+    ImGui::InputFloat("Base dmg / troop", &_create_unit_template._base_damage_normal, 1.f);
 }
 
 void UnitGraphPlot::configure_plot_window() {

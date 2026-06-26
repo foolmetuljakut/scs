@@ -2,6 +2,8 @@
 #include "../std.hpp"
 
 #include "../unit/IUnit.hpp"
+#include "../unit/UnitParams.hpp"
+#include "Terrain.hpp"
 
 #include "../generic/MaxChoice.hpp"
 
@@ -22,6 +24,8 @@ class Arena {
 public:
   void update_tick();
   size_t choose_opponent(size_t unit_index);
+  void apply_damage(const src::unit::UnitPtr& target_unit, 
+    decltype(src::unit::UnitParams::_base_damage_normal) incoming_normal);
 
   void add_unit(const src::unit::UnitPtr &ptr);
   void remove_unit(const src::unit::UnitPtr &ptr);
@@ -32,10 +36,15 @@ public:
   void remove_hostility(size_t team_a, size_t team_b);
   size_t size();
   src::unit::UnitPtr get_involved_unit(size_t index);
+  void set_terrain(Terrain t);
+
+  float calculate_damage_through_cover(const src::unit::UnitPtr& target_unit, 
+                         decltype(src::unit::UnitParams::_base_damage_normal) incoming_normal);
 
 private:
   std::vector<src::unit::UnitPtr> units_involved;
   std::vector<std::pair<size_t, size_t>> hostilities; // match hostile team ids
+  Terrain terrain;
 
   std::mt19937 rng{std::random_device{}()};
 

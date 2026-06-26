@@ -28,10 +28,7 @@ void Arena::update_tick() {
     float distance = 0;
     float damage_normal = acting_unit->damage_normal(distance);
 
-    if (damage_normal > 0) {
-      hostile_unit->apply_normal(damage_normal);
-      hostile_unit->apply_morale_damage(damage_normal);
-    }
+    apply_damage(hostile_unit, damage_normal);
   }
 
   std::erase_if(units_involved, [this](src::unit::UnitPtr &unit) {
@@ -63,6 +60,42 @@ size_t Arena::choose_opponent(size_t unit_index) {
   }
 
   return src::generic::max_choice(indices, comp);
+}
+
+void Arena::apply_damage(const src::unit::UnitPtr& target_unit, 
+                         decltype(src::unit::UnitParams::_base_damage_normal) incoming_normal) {
+
+  if (incoming_normal > 0) {
+    float modified_normal = calculate_damage_through_cover(target_unit, incoming_normal);
+
+    target_unit->apply_normal(modified_normal);
+    target_unit->apply_morale_damage(modified_normal);
+  }
+}
+
+float Arena::calculate_damage_through_cover(
+  const src::unit::UnitPtr& target_unit,
+  decltype(src::unit::UnitParams::_base_damage_normal) incoming_normal) {
+  
+    // basic idea: troops will fire at uncovered troops first (easy to pick off)
+    //  troops are divided into covered / uncovered troops - covered take only 0.244*incoming damage
+    //  incoming normal damage is divided between, prioritizing uncovered troops 
+
+    int target_troops_covered = std::min(target_unit->alive(), terrain._cover_provision),
+        target_troops_uncovered = target_unit->alive() - target_troops_covered;
+
+    float uncovered_normal = std::min(
+      static_cast<float>(target_troops_uncovered),
+      incoming_normal
+    ); // assign as much as possible to uncovered units
+
+    float covered_remaining = std::min(
+      static_cast<float>(target_troops_covered),
+      terrain._cover_factor * (incoming_normal - uncovered_normal)
+    ); // assign "left over" damage to covered units
+
+    float modified_normal = uncovered_normal + covered_remaining;
+    return modified_normal;
 }
 
 void Arena::add_unit(const src::unit::UnitPtr &ptr) {
@@ -113,6 +146,10 @@ size_t Arena::size() { return units_involved.size(); }
 
 src::unit::UnitPtr Arena::get_involved_unit(size_t index) {
   return units_involved[index];
+}
+
+void Arena::set_terrain(Terrain t) {
+  terrain = t;
 }
 
 std::vector<size_t> Arena::create_index_list(size_t n) {

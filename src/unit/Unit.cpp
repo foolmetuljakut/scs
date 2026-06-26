@@ -60,7 +60,9 @@ decltype(UnitParams::_base_damage_normal) Unit::damage_normal(float distance) {
 }
 
 void Unit::apply_normal(decltype(UnitParams::_base_damage_normal) incoming_normal) {
-    incoming_normal = std::min(incoming_normal, params._troops_alive);
+    incoming_normal = static_cast<decltype(UnitParams::_troops_alive)>(
+        std::min(incoming_normal, static_cast<float>(params._troops_alive))
+    );
 
     params._troops_alive -= incoming_normal;
     params._troops_wounded += incoming_normal;

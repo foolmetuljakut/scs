@@ -30,4 +30,13 @@ src::combat::ArenaPtr ArenaFactory::demoralizing_1v1() {
   return arena;
 }
 
+src::combat::ArenaPtr ArenaFactory::partial_cover_arena(int cover) {
+  auto arena = std::make_shared<src::combat::Arena>();
+  arena->set_hostility(0, 1);                   // team 0 and team 1 are hostile
+  arena->add_unit(UnitFactory::standard(0, 0)); // team 0, unit 0
+  arena->add_unit(UnitFactory::standard(1, 1)); // team 1, unit 1
+  arena->set_terrain(src::combat::Terrain{cover});
+  return arena;
+}
+
 }; // namespace test::combat
