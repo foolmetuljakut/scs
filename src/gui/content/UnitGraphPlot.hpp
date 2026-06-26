@@ -7,6 +7,7 @@
 #include "Config.hpp"
 #include "../IDrawable.hpp"
 #include "../../combat/Arena.hpp"
+#include "../../combat/Terrain.hpp"
 #include "../../unit/Unit.hpp"
 #include "../../unit/UnitParams.hpp"
 
@@ -25,6 +26,7 @@ private:
     void configure_unit();
     void basic_unit_config();
     void detailed_unit_config();
+    void configure_terrain();
     void configure_plot_window();
     void configure_plot_axes();
     void plot_units();
@@ -43,6 +45,9 @@ private:
     // Gui parameters
     bool _create_unit_all_params;
     src::unit::UnitParams _create_unit_template;
+    int _create_unit_camo_selector;
+    src::combat::Terrain _create_terrain_template;
+    int _create_terrain_camo_selector;
 };
 
 };

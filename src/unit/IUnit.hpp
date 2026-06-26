@@ -2,6 +2,7 @@
 #include "../std.hpp"
 #include "UnitParams.hpp"
 #include "TargetPreference.hpp"
+#include "CamoType.hpp"
 
 namespace src::unit {
 
@@ -20,12 +21,13 @@ public:
   virtual decltype(UnitParams::_morale) total_morale() = 0;
   virtual void apply_morale_damage(decltype(UnitParams::_total_morale) incoming_damage) = 0;
 
-  virtual decltype(UnitParams::_base_damage_normal) damage_normal(float distance) = 0;
+  virtual decltype(UnitParams::_effective_range) effective_range() = 0;
+  virtual decltype(UnitParams::_base_damage_normal) damage_normal() = 0;
   // later: explosives/splash/artillery, armor piercing / tank, ...
   virtual void apply_normal(decltype(UnitParams::_base_damage_normal) incoming_normal) = 0;
 
   virtual TargetPreference preference() = 0;
-  virtual float preference_stiffness() = 0;
+  virtual CamoType camo() = 0;
 };
 
 typedef std::shared_ptr<IUnit> UnitPtr;

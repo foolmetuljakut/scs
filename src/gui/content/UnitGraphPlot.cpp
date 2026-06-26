@@ -6,7 +6,10 @@ namespace src::gui::content {
 UnitGraphPlot::UnitGraphPlot()
     : _arena{std::make_shared<src::combat::Arena>()}
     , _create_unit_all_params{false}
-    , _create_unit_template{0, 1, 1000, 1000, 0, 100, 100, 1} {
+    , _create_unit_template{0, 1, 1000, 1000, 0, 100, 100, 0.1f, 100}
+    , _create_unit_camo_selector{0}
+    , _create_terrain_template{1000, 100}
+    , _create_terrain_camo_selector{0} {
     config.load("./etc/params.cfg");
     _arena->set_hostility(0, 1);
     _time_values.push_back(0); // units add their troop numbers on start
@@ -21,6 +24,7 @@ UnitGraphPlot::~UnitGraphPlot() {
 void UnitGraphPlot::draw() {
     configure_plot_window();
     configure_unit();
+    configure_terrain();
     configure_update();
 }
 
@@ -59,9 +63,9 @@ void UnitGraphPlot::configure_unit() {
 }
 
 void UnitGraphPlot::basic_unit_config() {
-    const char* options[] = { "Team A", "Team B" };
+    const char* team_options[] = { "Team A", "Team B" };
 
-    ImGui::Combo("Team A/B?", &_create_unit_template._team_id, options, IM_ARRAYSIZE(options));
+    ImGui::Combo("Team A/B?", &_create_unit_template._team_id, team_options, IM_ARRAYSIZE(team_options));
     ImGui::InputInt("Troops total", &_create_unit_template._troops_total);
     ImGui::InputInt("Morale pts total", &_create_unit_template._total_morale);
     ImGui::Checkbox("Show details", &_create_unit_all_params);
@@ -72,6 +76,46 @@ void UnitGraphPlot::detailed_unit_config() {
     ImGui::InputInt("Troops wounded", &_create_unit_template._troops_wounded);
     ImGui::InputInt("Morale pts", &_create_unit_template._morale);
     ImGui::InputFloat("Base dmg / troop", &_create_unit_template._base_damage_normal, 1.f);
+    ImGui::InputInt("Eff. Range", &_create_unit_template._effective_range, 1.f);
+
+    const char* camo_options[] = { 
+        "Normal",
+        "GrassPlains",
+        "TundraPlains",
+        "DesertPlains",
+        "ArcticPlains",
+        "Urbanous",
+        "Mountainous",
+        "DeciduousForest",
+        "ConiferousForest",
+        "DjungleForest" 
+    };
+    ImGui::Combo("Camo type", &_create_unit_camo_selector, camo_options, IM_ARRAYSIZE(camo_options));
+    _create_unit_template._camo = src::unit::CamoType{_create_unit_camo_selector};
+}
+
+void UnitGraphPlot::configure_terrain() {
+    ImGui::Begin("Configure Terrain");
+    
+    ImGui::InputInt("Coverable troops", &_create_terrain_template._cover_provision);
+    ImGui::InputInt("Max range", &_create_terrain_template._max_distance);
+
+    const char* camo_options[] = { 
+        "Normal",
+        "GrassPlains",
+        "TundraPlains",
+        "DesertPlains",
+        "ArcticPlains",
+        "Urbanous",
+        "Mountainous",
+        "DeciduousForest",
+        "ConiferousForest",
+        "DjungleForest" 
+    };
+    ImGui::Combo("Camo type", &_create_terrain_camo_selector, camo_options, IM_ARRAYSIZE(camo_options));
+    _create_terrain_template._terrain_type = src::unit::CamoType{_create_terrain_camo_selector};
+
+    ImGui::End();
 }
 
 void UnitGraphPlot::configure_plot_window() {
@@ -82,6 +126,14 @@ void UnitGraphPlot::configure_plot_window() {
     if (ImPlot::BeginPlot("Alive")) {
         plot_units();
         ImPlot::EndPlot();
+    }
+
+    for(size_t i = 0; i < _time_values.size(); i++) {
+        std::string s = "Round " + std::to_string(i) + std::string(". alive: ");
+        for(size_t j = 0; j < _alive_per_unit.size(); j++) {
+            s += std::to_string(_alive_per_unit[j][i]) + std::string(", ");
+        }
+        ImGui::Text(s.c_str());
     }
 
     ImGui::End();
@@ -129,6 +181,7 @@ void UnitGraphPlot::add_unit(decltype(src::unit::UnitParams::_team_id) team_id) 
 }
 
 void UnitGraphPlot::update_tick() {
+    _arena->set_terrain(_create_terrain_template);
     _arena->update_tick();
     _time_values.push_back(static_cast<uint32_t>(_time_values.size()));
 

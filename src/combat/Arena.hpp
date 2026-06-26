@@ -38,7 +38,10 @@ public:
   src::unit::UnitPtr get_involved_unit(size_t index);
   void set_terrain(Terrain t);
 
+  float calculate_normal_damage_over_distance(const src::unit::UnitPtr& acting_unit, const src::unit::UnitPtr& target_unit);
   float calculate_damage_through_cover(const src::unit::UnitPtr& target_unit, 
+                         decltype(src::unit::UnitParams::_base_damage_normal) incoming_normal);
+  float calculate_damage_through_camo(const src::unit::UnitPtr& target_unit, 
                          decltype(src::unit::UnitParams::_base_damage_normal) incoming_normal);
 
 private:

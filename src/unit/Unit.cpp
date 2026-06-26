@@ -7,7 +7,10 @@ Unit::Unit(decltype(UnitParams::_team_id) team_id, decltype(UnitParams::_unit_id
         team_id, unit_id,
         1000, 1000, 0,
         100, 100,
-        1
+        1,
+        100,
+        CamoType::Normal,
+        TargetPreference::Normal
     } {}
 
 Unit::Unit(decltype(UnitParams::_unit_id) unit_id, const UnitParams& other)
@@ -15,7 +18,10 @@ Unit::Unit(decltype(UnitParams::_unit_id) unit_id, const UnitParams& other)
         other._team_id, unit_id, 
         other._troops_total, other._troops_alive, other._troops_wounded, 
         other._total_morale, other._morale, 
-        other._base_damage_normal
+        other._base_damage_normal,
+        other._effective_range,
+        other._camo,
+        other._target_preference
     } {}
 
 Unit::~Unit() {
@@ -55,7 +61,11 @@ void Unit::apply_morale_damage(decltype(UnitParams::_total_morale) incoming_dama
     params._morale -= incoming_damage;
 }
 
-decltype(UnitParams::_base_damage_normal) Unit::damage_normal(float distance) {
+decltype(UnitParams::_effective_range) Unit::effective_range() {
+    return params._effective_range;
+}
+
+decltype(UnitParams::_base_damage_normal) Unit::damage_normal() {
     return params._base_damage_normal * alive();
 }
 
@@ -69,11 +79,11 @@ void Unit::apply_normal(decltype(UnitParams::_base_damage_normal) incoming_norma
 }
 
 TargetPreference Unit::preference() {
-    return src::unit::TargetPreference::Normal;
+    return params._target_preference;
 }
 
-float Unit::preference_stiffness() {
-    return 0.1f; 
+CamoType Unit::camo() {
+    return params._camo;
 }
 
 Unit &Unit::manpower(decltype(UnitParams::_troops_total) set) {
@@ -99,6 +109,16 @@ Unit &Unit::base_damage(decltype(UnitParams::_base_damage_normal) set) {
 Unit &Unit::base_morale(decltype(UnitParams::_total_morale) set) {
     params._total_morale = set;
     params._morale = set;
+    return *this;
+}
+
+Unit &Unit::range(decltype(UnitParams::_effective_range) set) {
+    params._effective_range = set;
+    return *this;
+}
+
+Unit &Unit::set_camo(decltype(UnitParams::_camo) set) {
+    params._camo = set;
     return *this;
 }
 

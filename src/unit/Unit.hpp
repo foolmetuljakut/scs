@@ -21,17 +21,20 @@ public:
   decltype(UnitParams::_morale) morale() override;
   virtual void apply_morale_damage(decltype(UnitParams::_total_morale) incoming_damage) override;
 
-  decltype(UnitParams::_base_damage_normal) damage_normal(float distance) override;
+  decltype(UnitParams::_effective_range) effective_range() override;
+  decltype(UnitParams::_base_damage_normal) damage_normal() override;
   void apply_normal(decltype(UnitParams::_base_damage_normal) incoming_normal) override;
 
   src::unit::TargetPreference preference() override;
-  float preference_stiffness() override;
+  CamoType camo() override;
 
   Unit &manpower(decltype(UnitParams::_troops_total) set);
   Unit &alive(decltype(UnitParams::_troops_alive) set);
   Unit &wounded(decltype(UnitParams::_troops_wounded) set);
   Unit &base_damage(decltype(UnitParams::_base_damage_normal) set);
   Unit &base_morale(decltype(UnitParams::_total_morale) set);
+  Unit &range(decltype(UnitParams::_effective_range) set);
+  Unit &set_camo(decltype(UnitParams::_camo) set);
 
 private:
   UnitParams params;

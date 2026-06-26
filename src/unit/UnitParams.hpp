@@ -1,5 +1,7 @@
 #pragma once
 #include "../std.hpp"
+#include "TargetPreference.hpp"
+#include "CamoType.hpp"
 
 namespace src::unit {
 
@@ -10,6 +12,9 @@ struct UnitParams {
   int _troops_total, _troops_alive, _troops_wounded;
   int _total_morale, _morale;
   float _base_damage_normal;
+  int _effective_range;
+  CamoType _camo;
+  TargetPreference _target_preference;
 };
 
 };

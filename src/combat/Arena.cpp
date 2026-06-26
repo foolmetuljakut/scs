@@ -24,10 +24,7 @@ void Arena::update_tick() {
       continue;
     }
 
-    // TODO find distance
-    float distance = 0;
-    float damage_normal = acting_unit->damage_normal(distance);
-
+    float damage_normal = calculate_normal_damage_over_distance(acting_unit, hostile_unit);
     apply_damage(hostile_unit, damage_normal);
   }
 
@@ -52,10 +49,9 @@ size_t Arena::choose_opponent(size_t unit_index) {
   switch (pref) {
   case src::unit::TargetPreference::Normal:
   default:
-    // TODO replace close range approximation (0.0f)
     comp = [&, pref](const size_t &a, const size_t &b) {
-      return units_involved[a]->damage_normal(0.0f) <
-             units_involved[b]->damage_normal(0.0f);
+      return units_involved[a]->damage_normal() <
+             units_involved[b]->damage_normal();
     };
   }
 
@@ -66,11 +62,33 @@ void Arena::apply_damage(const src::unit::UnitPtr& target_unit,
                          decltype(src::unit::UnitParams::_base_damage_normal) incoming_normal) {
 
   if (incoming_normal > 0) {
-    float modified_normal = calculate_damage_through_cover(target_unit, incoming_normal);
+    // reduce incoming damage through a pipeline of accounting different effects
+    float normal_with_cover = calculate_damage_through_cover(target_unit, incoming_normal);
+    float normal_with_cover_camo = calculate_damage_through_camo(target_unit, normal_with_cover);
 
-    target_unit->apply_normal(modified_normal);
-    target_unit->apply_morale_damage(modified_normal);
+    target_unit->apply_normal(normal_with_cover_camo);
+    target_unit->apply_morale_damage(normal_with_cover_camo);
   }
+}
+
+float Arena::calculate_normal_damage_over_distance(const src::unit::UnitPtr& acting_unit, const src::unit::UnitPtr& target_unit) {
+
+  // one unit will always start at their supposedly higher effectivy range, while the other has to work with that
+  float distance = std::max(
+    std::min(terrain._max_distance, acting_unit->effective_range()),
+    std::min(terrain._max_distance, target_unit->effective_range())
+  );
+
+  float drop_off_probability = 1.f;
+  if(distance > 0) {
+    drop_off_probability = std::min(
+      0.5f * acting_unit->effective_range() / distance,
+      1.f
+    );
+  }
+
+  float damage_normal = acting_unit->damage_normal() * drop_off_probability;
+  return damage_normal;
 }
 
 float Arena::calculate_damage_through_cover(
@@ -95,6 +113,19 @@ float Arena::calculate_damage_through_cover(
     ); // assign "left over" damage to covered units
 
     float modified_normal = uncovered_normal + covered_remaining;
+    return modified_normal;
+}
+
+float Arena::calculate_damage_through_camo(const src::unit::UnitPtr& target_unit, 
+                        decltype(src::unit::UnitParams::_base_damage_normal) incoming_normal) {
+
+    float modified_normal = incoming_normal;
+
+    if(target_unit->camo() != src::unit::CamoType::Normal && 
+        target_unit->camo() == terrain._terrain_type) {
+      modified_normal *= terrain._camo_factor;
+    }
+
     return modified_normal;
 }
 
