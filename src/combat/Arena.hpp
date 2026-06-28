@@ -7,6 +7,8 @@
 
 #include "../generic/MaxChoice.hpp"
 
+#include "DamageCalculatorFactory.hpp"
+
 namespace src::combat {
 
 // TODO
@@ -39,12 +41,6 @@ public:
   void set_terrain(Terrain t);
 
   void attack_unit(const src::unit::UnitPtr& acting_unit, const src::unit::UnitPtr& target_unit);
-  void calculate_normal_damage(const src::unit::UnitPtr& acting_unit, const src::unit::UnitPtr& target_unit);
-  float calculate_normal_damage_over_distance(const src::unit::UnitPtr& acting_unit, const src::unit::UnitPtr& target_unit);
-  float calculate_damage_through_cover_and_ducking(const src::unit::UnitPtr& target_unit, 
-                         decltype(src::unit::UnitParams::_base_damage_normal) incoming_normal);
-  float calculate_damage_through_camo(const src::unit::UnitPtr& target_unit, 
-                         decltype(src::unit::UnitParams::_base_damage_normal) incoming_normal);
 
 private:
   std::vector<src::unit::UnitPtr> units_involved;
