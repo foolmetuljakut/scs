@@ -27,6 +27,7 @@ public:
 
   src::unit::TargetPreference preference() override;
   CamoType camo() override;
+  bool ducked() override;
 
   Unit &manpower(decltype(UnitParams::_troops_total) set);
   Unit &alive(decltype(UnitParams::_troops_alive) set);
@@ -35,6 +36,7 @@ public:
   Unit &base_morale(decltype(UnitParams::_total_morale) set);
   Unit &range(decltype(UnitParams::_effective_range) set);
   Unit &set_camo(decltype(UnitParams::_camo) set);
+  Unit &duck(decltype(UnitParams::_ducked) set);
 
 private:
   UnitParams params;

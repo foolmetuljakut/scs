@@ -12,9 +12,6 @@ UnitGraphPlot::UnitGraphPlot()
     , _create_terrain_camo_selector{0} {
     config.load("./etc/params.cfg");
     _arena->set_hostility(0, 1);
-    _time_values.push_back(0); // units add their troop numbers on start
-    add_unit(0);
-    add_unit(1);
 }
 
 UnitGraphPlot::~UnitGraphPlot() {
@@ -77,6 +74,7 @@ void UnitGraphPlot::detailed_unit_config() {
     ImGui::InputInt("Morale pts", &_create_unit_template._morale);
     ImGui::InputFloat("Base dmg / troop", &_create_unit_template._base_damage_normal, 1.f);
     ImGui::InputInt("Eff. Range", &_create_unit_template._effective_range, 1.f);
+    ImGui::Checkbox("Duck and cover", &_create_unit_template._ducked);
 
     const char* camo_options[] = { 
         "Normal",
@@ -140,6 +138,10 @@ void UnitGraphPlot::configure_plot_window() {
 }
 
 void UnitGraphPlot::configure_plot_axes() {
+
+    if(_time_values.size() == 0) {
+        return;
+    }
 
     uint32_t t_min = *std::min_element(_time_values.begin(), _time_values.end()),
             t_max = *std::max_element(_time_values.begin(), _time_values.end());

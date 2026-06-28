@@ -86,6 +86,10 @@ CamoType Unit::camo() {
     return params._camo;
 }
 
+bool Unit::ducked() {
+    return params._ducked;
+}
+
 Unit &Unit::manpower(decltype(UnitParams::_troops_total) set) {
     params._troops_total = set;
     return *this;
@@ -119,6 +123,11 @@ Unit &Unit::range(decltype(UnitParams::_effective_range) set) {
 
 Unit &Unit::set_camo(decltype(UnitParams::_camo) set) {
     params._camo = set;
+    return *this;
+}
+
+Unit &Unit::duck(decltype(UnitParams::_ducked) set) {
+    params._ducked = set;
     return *this;
 }
 

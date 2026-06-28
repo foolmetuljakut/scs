@@ -24,8 +24,7 @@ void Arena::update_tick() {
       continue;
     }
 
-    float damage_normal = calculate_normal_damage_over_distance(acting_unit, hostile_unit);
-    apply_damage(hostile_unit, damage_normal);
+    attack_unit(acting_unit, hostile_unit);
   }
 
   std::erase_if(units_involved, [this](src::unit::UnitPtr &unit) {
@@ -58,16 +57,25 @@ size_t Arena::choose_opponent(size_t unit_index) {
   return src::generic::max_choice(indices, comp);
 }
 
+void Arena::attack_unit(const src::unit::UnitPtr& acting_unit, const src::unit::UnitPtr& target_unit) {
+  calculate_normal_damage(acting_unit, target_unit);
+}
+
+void Arena::calculate_normal_damage(const src::unit::UnitPtr& acting_unit, const src::unit::UnitPtr& target_unit) {
+  float damage_normal = calculate_normal_damage_over_distance(acting_unit, target_unit);
+  apply_damage(target_unit, damage_normal);
+}
+
 void Arena::apply_damage(const src::unit::UnitPtr& target_unit, 
                          decltype(src::unit::UnitParams::_base_damage_normal) incoming_normal) {
 
   if (incoming_normal > 0) {
     // reduce incoming damage through a pipeline of accounting different effects
-    float normal_with_cover = calculate_damage_through_cover(target_unit, incoming_normal);
-    float normal_with_cover_camo = calculate_damage_through_camo(target_unit, normal_with_cover);
+    float normal_with_ducking_cover = calculate_damage_through_cover_and_ducking(target_unit, incoming_normal);
+    float normal_with_ducking_cover_camo = calculate_damage_through_camo(target_unit, normal_with_ducking_cover);
 
-    target_unit->apply_normal(normal_with_cover_camo);
-    target_unit->apply_morale_damage(normal_with_cover_camo);
+    target_unit->apply_normal(normal_with_ducking_cover_camo);
+    target_unit->apply_morale_damage(normal_with_ducking_cover_camo);
   }
 }
 
@@ -91,7 +99,7 @@ float Arena::calculate_normal_damage_over_distance(const src::unit::UnitPtr& act
   return damage_normal;
 }
 
-float Arena::calculate_damage_through_cover(
+float Arena::calculate_damage_through_cover_and_ducking(
   const src::unit::UnitPtr& target_unit,
   decltype(src::unit::UnitParams::_base_damage_normal) incoming_normal) {
   
@@ -111,6 +119,10 @@ float Arena::calculate_damage_through_cover(
       static_cast<float>(target_troops_covered),
       terrain._cover_factor * (incoming_normal - uncovered_normal)
     ); // assign "left over" damage to covered units
+
+    if(target_unit->ducked()) {
+      uncovered_normal *= terrain._ducking_factor;
+    } // additionally, those not in cover can lay down and duck
 
     float modified_normal = uncovered_normal + covered_remaining;
     return modified_normal;

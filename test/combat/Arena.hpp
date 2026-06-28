@@ -182,5 +182,40 @@ TEST_CASE("Test Arena - camo - no effect from non-matching camo", "[require]") {
   REQUIRE(theoretical_damage == damage_including_camo);
 }
 
+TEST_CASE("Test Arena - ducking - no effect from not ducking", "[require]") {
+  auto arena = ArenaFactory::minimum_standard_arena();
+  auto unit_a = arena->get_involved_unit(0), unit_b = arena->get_involved_unit(1);
+  std::dynamic_pointer_cast<src::unit::Unit>(unit_b)->duck(false);
+
+  arena->set_terrain(src::combat::Terrain{0, 0, src::unit::CamoType::Normal}); // 0 cover, 0 max range
+  float theoretical_damage = arena->calculate_normal_damage_over_distance(unit_a, unit_b);
+  float damage_including_ducking = arena->calculate_damage_through_cover_and_ducking(unit_b, theoretical_damage);
+
+  REQUIRE(theoretical_damage == damage_including_ducking);
+}
+
+TEST_CASE("Test Arena - ducking - good effect from ducking", "[require]") {
+  auto arena = ArenaFactory::minimum_standard_arena();
+  auto unit_a = arena->get_involved_unit(0), unit_b = arena->get_involved_unit(1);
+  std::dynamic_pointer_cast<src::unit::Unit>(unit_b)->duck(true);
+
+  arena->set_terrain(src::combat::Terrain{0, 0, src::unit::CamoType::GrassPlains}); // 0 cover, 0 max range
+  float theoretical_damage = arena->calculate_normal_damage_over_distance(unit_a, unit_b);
+  float damage_including_ducking = arena->calculate_damage_through_cover_and_ducking(unit_b, theoretical_damage);
+
+  REQUIRE(theoretical_damage >= 2.5 * damage_including_ducking);
+}
+
+TEST_CASE("Test Arena - ducking - no additional benefit from ducking if in cover", "[require]") {
+  auto arena = ArenaFactory::minimum_standard_arena();
+  auto unit_a = arena->get_involved_unit(0), unit_b = arena->get_involved_unit(1);
+  std::dynamic_pointer_cast<src::unit::Unit>(unit_b)->duck(true);
+
+  arena->set_terrain(src::combat::Terrain{unit_a->alive(), 0, src::unit::CamoType::GrassPlains}); // full cover, 0 max range
+  float theoretical_damage = arena->calculate_normal_damage_over_distance(unit_a, unit_b);
+  float damage_actually_from_cover = arena->calculate_damage_through_cover_and_ducking(unit_b, theoretical_damage);
+
+  REQUIRE(src::combat::Terrain::_ducking_factor * theoretical_damage > damage_actually_from_cover);
+}
 
 }; // namespace test::combat

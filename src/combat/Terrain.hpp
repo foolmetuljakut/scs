@@ -11,6 +11,7 @@ namespace src::combat {
         
         static const float _cover_factor; // how well are they covered
         static const float _camo_factor; // how well you remain hidden with a matching color pattern in your environment
+        static const float _ducking_factor; // yes. the factor of ducking and staying flat on the ground (immobile)
     };
 
 };
