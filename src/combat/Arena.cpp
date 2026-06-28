@@ -46,6 +46,16 @@ size_t Arena::choose_opponent(size_t unit_index) {
   std::function<bool(const size_t &, const size_t &)> comp;
 
   switch (pref) {
+  case src::unit::TargetPreference::Artillery:
+    comp = [&, pref](const size_t &a, const size_t &b) {
+      return units_involved[a]->damage_artillery() <
+             units_involved[b]->damage_artillery();
+    };
+  case src::unit::TargetPreference::Explosive:
+    comp = [&, pref](const size_t &a, const size_t &b) {
+      return units_involved[a]->damage_explosives() <
+             units_involved[b]->damage_explosives();
+    };
   case src::unit::TargetPreference::Normal:
   default:
     comp = [&, pref](const size_t &a, const size_t &b) {
@@ -58,6 +68,8 @@ size_t Arena::choose_opponent(size_t unit_index) {
 }
 
 void Arena::attack_unit(const src::unit::UnitPtr& acting_unit, const src::unit::UnitPtr& target_unit) {
+  DamageCalculatorFactory::artillery_damage(acting_unit, target_unit, terrain)->execute_attack();
+  DamageCalculatorFactory::explosive_damage(acting_unit, target_unit, terrain)->execute_attack();
   DamageCalculatorFactory::normal_damage(acting_unit, target_unit, terrain)->execute_attack();
 }
 

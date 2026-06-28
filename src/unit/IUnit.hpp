@@ -23,13 +23,15 @@ public:
 
   virtual decltype(UnitParams::_effective_range) effective_range() = 0;
   virtual decltype(UnitParams::_base_damage_normal) damage_normal() = 0;
+  virtual decltype(UnitParams::_base_damage_explosives) damage_explosives() = 0;
+  virtual decltype(UnitParams::_base_damage_artillery) damage_artillery() = 0;
   // later: explosives/splash/artillery, armor piercing / tank, ...
-  virtual void apply_normal(decltype(UnitParams::_base_damage_normal) incoming_normal) = 0;
+  virtual void apply_damage(float incoming) = 0;
 
-  virtual TargetPreference preference() = 0;
-  virtual CamoType camo() = 0;
-  virtual bool ducked() = 0;
-  virtual bool dug_in() = 0;
+  virtual decltype(UnitParams::_target_preference) preference() = 0;
+  virtual decltype(UnitParams::_camo) camo() = 0;
+  virtual decltype(UnitParams::_ducked) ducked() = 0;
+  virtual decltype(UnitParams::_dug_in) dug_in() = 0;
 };
 
 typedef std::shared_ptr<IUnit> UnitPtr;

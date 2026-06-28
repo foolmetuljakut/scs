@@ -14,6 +14,12 @@ public:
                                                     size_t unit_id,
                                                     size_t alive, size_t damage,
                                                     size_t base_morale);
+  static src::unit::UnitPtr explosive_damage(size_t team_id, size_t unit_id,
+                                          size_t base_damage_explosive);
+  static src::unit::UnitPtr artillery_damage(size_t team_id, size_t unit_id,
+                                          size_t base_damage_artillery);
+  static src::unit::UnitPtr camo(size_t team_id, size_t unit_id, src::unit::CamoType camo);
+  static src::unit::UnitPtr ducking(size_t team_id, size_t unit_id);
 };
 
 }; // namespace test::combat

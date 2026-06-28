@@ -11,7 +11,7 @@ struct UnitParams {
   size_t _unit_id;
   int _troops_total, _troops_alive, _troops_wounded;
   int _total_morale, _morale;
-  float _base_damage_normal;
+  float _base_damage_normal, _base_damage_explosives, _base_damage_artillery;
   int _effective_range;
   CamoType _camo;
   TargetPreference _target_preference;

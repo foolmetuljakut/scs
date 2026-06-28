@@ -23,7 +23,9 @@ public:
 
   decltype(UnitParams::_effective_range) effective_range() override;
   decltype(UnitParams::_base_damage_normal) damage_normal() override;
-  void apply_normal(decltype(UnitParams::_base_damage_normal) incoming_normal) override;
+  decltype(UnitParams::_base_damage_explosives) damage_explosives() override;
+  decltype(UnitParams::_base_damage_artillery) damage_artillery() override;
+  void apply_damage(float incoming) override;
 
   decltype(UnitParams::_target_preference) preference() override;
   decltype(UnitParams::_camo) camo() override;
@@ -34,6 +36,8 @@ public:
   Unit &alive(decltype(UnitParams::_troops_alive) set);
   Unit &wounded(decltype(UnitParams::_troops_wounded) set);
   Unit &base_damage(decltype(UnitParams::_base_damage_normal) set);
+  Unit &base_explosive_damage(decltype(UnitParams::_base_damage_explosives) set);
+  Unit &base_artillery_damage(decltype(UnitParams::_base_damage_artillery) set);
   Unit &base_morale(decltype(UnitParams::_total_morale) set);
   Unit &range(decltype(UnitParams::_effective_range) set);
   Unit &set_camo(decltype(UnitParams::_camo) set);

@@ -7,7 +7,7 @@ Unit::Unit(decltype(UnitParams::_team_id) team_id, decltype(UnitParams::_unit_id
         team_id, unit_id,
         1000, 1000, 0,
         100, 100,
-        1,
+        1, 0, 0,
         100,
         CamoType::Normal,
         TargetPreference::Normal
@@ -18,7 +18,7 @@ Unit::Unit(decltype(UnitParams::_unit_id) unit_id, const UnitParams& other)
         other._team_id, unit_id, 
         other._troops_total, other._troops_alive, other._troops_wounded, 
         other._total_morale, other._morale, 
-        other._base_damage_normal,
+        other._base_damage_normal, other._base_damage_explosives, other._base_damage_artillery,
         other._effective_range,
         other._camo,
         other._target_preference,
@@ -71,13 +71,21 @@ decltype(UnitParams::_base_damage_normal) Unit::damage_normal() {
     return params._base_damage_normal * alive();
 }
 
-void Unit::apply_normal(decltype(UnitParams::_base_damage_normal) incoming_normal) {
-    incoming_normal = static_cast<decltype(UnitParams::_troops_alive)>(
-        std::min(incoming_normal, static_cast<float>(params._troops_alive))
+decltype(UnitParams::_base_damage_explosives) Unit::damage_explosives() {
+    return params._base_damage_explosives * alive();
+}
+
+decltype(UnitParams::_base_damage_artillery) Unit::damage_artillery() {
+    return params._base_damage_artillery * alive();
+}
+
+void Unit::apply_damage(float incoming) {
+    incoming = static_cast<decltype(UnitParams::_troops_alive)>(
+        std::min(incoming, static_cast<float>(params._troops_alive))
     );
 
-    params._troops_alive -= incoming_normal;
-    params._troops_wounded += incoming_normal;
+    params._troops_alive -= incoming;
+    params._troops_wounded += incoming;
 }
 
 decltype(UnitParams::_target_preference) Unit::preference() {
@@ -113,6 +121,16 @@ Unit &Unit::wounded(decltype(UnitParams::_troops_wounded) set) {
 
 Unit &Unit::base_damage(decltype(UnitParams::_base_damage_normal) set) {
     params._base_damage_normal = set;
+    return *this;
+}
+
+Unit &Unit::base_explosive_damage(decltype(UnitParams::_base_damage_explosives) set) {
+    params._base_damage_explosives = set;
+    return *this;
+}
+
+Unit &Unit::base_artillery_damage(decltype(UnitParams::_base_damage_artillery) set) {
+    params._base_damage_artillery = set;
     return *this;
 }
 

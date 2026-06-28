@@ -6,7 +6,7 @@ namespace src::gui::content {
 UnitGraphPlot::UnitGraphPlot()
     : _arena{std::make_shared<src::combat::Arena>()}
     , _create_unit_all_params{false}
-    , _create_unit_template{0, 1, 1000, 1000, 0, 100, 100, 0.1f, 100}
+    , _create_unit_template{0, 1, 1000, 1000, 0, 100, 100, 0.1f, 0.f, 0.f, 100, src::unit::CamoType::Normal, src::unit::TargetPreference::Normal, false, false}
     , _create_unit_camo_selector{0}
     , _create_terrain_template{1000, 100}
     , _create_terrain_camo_selector{0} {
@@ -73,6 +73,8 @@ void UnitGraphPlot::detailed_unit_config() {
     ImGui::InputInt("Troops wounded", &_create_unit_template._troops_wounded);
     ImGui::InputInt("Morale pts", &_create_unit_template._morale);
     ImGui::InputFloat("Base dmg / troop", &_create_unit_template._base_damage_normal, 1.f);
+    ImGui::InputFloat("Grenade dmg / troop", &_create_unit_template._base_damage_explosives, 1.f);
+    ImGui::InputFloat("Artillery dmg / troop", &_create_unit_template._base_damage_artillery, 1.f);
     ImGui::InputInt("Eff. Range", &_create_unit_template._effective_range, 1.f);
     ImGui::Checkbox("Duck and cover", &_create_unit_template._ducked);
     ImGui::Checkbox("Dig in", &_create_unit_template._dug_in);
