@@ -21,7 +21,9 @@ Unit::Unit(decltype(UnitParams::_unit_id) unit_id, const UnitParams& other)
         other._base_damage_normal,
         other._effective_range,
         other._camo,
-        other._target_preference
+        other._target_preference,
+        other._ducked,
+        other._dug_in
     } {}
 
 Unit::~Unit() {
@@ -78,16 +80,20 @@ void Unit::apply_normal(decltype(UnitParams::_base_damage_normal) incoming_norma
     params._troops_wounded += incoming_normal;
 }
 
-TargetPreference Unit::preference() {
+decltype(UnitParams::_target_preference) Unit::preference() {
     return params._target_preference;
 }
 
-CamoType Unit::camo() {
+decltype(UnitParams::_camo) Unit::camo() {
     return params._camo;
 }
 
-bool Unit::ducked() {
+decltype(UnitParams::_ducked) Unit::ducked() {
     return params._ducked;
+}
+
+decltype(UnitParams::_dug_in) Unit::dug_in() {
+    return params._dug_in;
 }
 
 Unit &Unit::manpower(decltype(UnitParams::_troops_total) set) {
@@ -128,6 +134,11 @@ Unit &Unit::set_camo(decltype(UnitParams::_camo) set) {
 
 Unit &Unit::duck(decltype(UnitParams::_ducked) set) {
     params._ducked = set;
+    return *this;
+}
+
+Unit &Unit::set_dug_in(decltype(UnitParams::_dug_in) set) {
+    params._dug_in = set;
     return *this;
 }
 

@@ -218,4 +218,28 @@ TEST_CASE("Test Arena - ducking - no additional benefit from ducking if in cover
   REQUIRE(src::combat::Terrain::_ducking_factor * theoretical_damage > damage_actually_from_cover);
 }
 
+TEST_CASE("Test Arena - digging in - no effect from not being dug in", "[require]") {
+  auto arena = ArenaFactory::minimum_standard_arena();
+  auto unit_a = arena->get_involved_unit(0), unit_b = arena->get_involved_unit(1);
+  std::dynamic_pointer_cast<src::unit::Unit>(unit_b)->set_dug_in(false);
+
+  arena->set_terrain(src::combat::Terrain{0, 0, src::unit::CamoType::Normal}); // 0 cover, 0 max range
+  float theoretical_damage = arena->calculate_normal_damage_over_distance(unit_a, unit_b);
+  float damage_including_dug_in = arena->calculate_damage_through_cover_and_ducking(unit_b, theoretical_damage);
+
+  REQUIRE(theoretical_damage == damage_including_dug_in);
+}
+
+TEST_CASE("Test Arena - digging in - being dug in counts as covered", "[require]") {
+  auto arena = ArenaFactory::minimum_standard_arena();
+  auto unit_a = arena->get_involved_unit(0), unit_b = arena->get_involved_unit(1);
+  std::dynamic_pointer_cast<src::unit::Unit>(unit_b)->set_dug_in(true);
+
+  arena->set_terrain(src::combat::Terrain{0, 0, src::unit::CamoType::GrassPlains}); // 0 cover - but we will get full cover by digging in, 0 max range
+  float theoretical_damage = arena->calculate_normal_damage_over_distance(unit_a, unit_b);
+  float damage_including_dug_in = arena->calculate_damage_through_cover_and_ducking(unit_b, theoretical_damage);
+
+  REQUIRE(src::combat::Terrain::_cover_factor * theoretical_damage == damage_including_dug_in);
+}
+
 }; // namespace test::combat

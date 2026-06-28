@@ -15,7 +15,7 @@ struct UnitParams {
   int _effective_range;
   CamoType _camo;
   TargetPreference _target_preference;
-  bool _ducked;
+  bool _ducked, _dug_in;
 };
 
 };

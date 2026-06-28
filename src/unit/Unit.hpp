@@ -25,9 +25,10 @@ public:
   decltype(UnitParams::_base_damage_normal) damage_normal() override;
   void apply_normal(decltype(UnitParams::_base_damage_normal) incoming_normal) override;
 
-  src::unit::TargetPreference preference() override;
-  CamoType camo() override;
-  bool ducked() override;
+  decltype(UnitParams::_target_preference) preference() override;
+  decltype(UnitParams::_camo) camo() override;
+  decltype(UnitParams::_ducked) ducked() override;
+  decltype(UnitParams::_dug_in) dug_in() override;
 
   Unit &manpower(decltype(UnitParams::_troops_total) set);
   Unit &alive(decltype(UnitParams::_troops_alive) set);
@@ -37,6 +38,7 @@ public:
   Unit &range(decltype(UnitParams::_effective_range) set);
   Unit &set_camo(decltype(UnitParams::_camo) set);
   Unit &duck(decltype(UnitParams::_ducked) set);
+  Unit &set_dug_in(decltype(UnitParams::_dug_in) set);
 
 private:
   UnitParams params;

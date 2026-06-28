@@ -107,7 +107,10 @@ float Arena::calculate_damage_through_cover_and_ducking(
     //  troops are divided into covered / uncovered troops - covered take only 0.244*incoming damage
     //  incoming normal damage is divided between, prioritizing uncovered troops 
 
-    int target_troops_covered = std::min(target_unit->alive(), terrain._cover_provision),
+    // units that are dug in count as covered, even if the terrain doesn't provide cover
+    int _effective_cover_provision = target_unit->dug_in() ? target_unit->alive() : terrain._cover_provision;
+
+    int target_troops_covered = std::min(target_unit->alive(), _effective_cover_provision),
         target_troops_uncovered = target_unit->alive() - target_troops_covered;
 
     float uncovered_normal = std::min(

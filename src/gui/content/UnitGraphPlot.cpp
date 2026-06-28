@@ -75,6 +75,7 @@ void UnitGraphPlot::detailed_unit_config() {
     ImGui::InputFloat("Base dmg / troop", &_create_unit_template._base_damage_normal, 1.f);
     ImGui::InputInt("Eff. Range", &_create_unit_template._effective_range, 1.f);
     ImGui::Checkbox("Duck and cover", &_create_unit_template._ducked);
+    ImGui::Checkbox("Dig in", &_create_unit_template._dug_in);
 
     const char* camo_options[] = { 
         "Normal",

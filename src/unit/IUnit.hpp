@@ -29,6 +29,7 @@ public:
   virtual TargetPreference preference() = 0;
   virtual CamoType camo() = 0;
   virtual bool ducked() = 0;
+  virtual bool dug_in() = 0;
 };
 
 typedef std::shared_ptr<IUnit> UnitPtr;
