@@ -10,6 +10,7 @@
 #include "../../combat/Terrain.hpp"
 #include "../../unit/Unit.hpp"
 #include "../../unit/UnitParams.hpp"
+#include "../../unit/UnitParamsFactory.hpp"
 
 namespace src::gui::content {
 
@@ -25,6 +26,7 @@ private:
     void configure_update();
     void configure_unit();
     void basic_unit_config();
+    void assign_unit_preset_config();
     void detailed_unit_config();
     void configure_terrain();
     void configure_plot_window();
@@ -48,6 +50,7 @@ private:
     int _create_unit_camo_selector;
     src::combat::Terrain _create_terrain_template;
     int _create_terrain_camo_selector;
+    int _unit_preset_selector;
 };
 
 };

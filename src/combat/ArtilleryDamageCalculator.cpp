@@ -14,7 +14,7 @@ void ArtilleryDamageCalculator::apply_damage(decltype(src::unit::UnitParams::_ba
     float normal_with_cover = calculate_damage_through_cover(incoming);
 
     target_unit->apply_damage(normal_with_cover);
-    target_unit->apply_morale_damage(normal_with_cover);
+    target_unit->apply_morale_damage(normal_with_cover, incoming - normal_with_cover);
   }
 }
 

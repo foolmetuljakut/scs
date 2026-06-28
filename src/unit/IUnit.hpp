@@ -19,7 +19,7 @@ public:
 
   virtual decltype(UnitParams::_total_morale) morale() = 0;
   virtual decltype(UnitParams::_morale) total_morale() = 0;
-  virtual void apply_morale_damage(decltype(UnitParams::_total_morale) incoming_damage) = 0;
+  virtual void apply_morale_damage(decltype(UnitParams::_morale) incoming_damage, decltype(UnitParams::_morale) suppressed_damage) = 0;
 
   virtual decltype(UnitParams::_effective_range) effective_range() = 0;
   virtual decltype(UnitParams::_base_damage_normal) damage_normal() = 0;

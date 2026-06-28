@@ -15,7 +15,7 @@ void ExplosiveDamageCalculator::apply_damage(decltype(src::unit::UnitParams::_ba
     float normal_with_ducking_cover_camo = calculate_damage_through_camo(normal_with_ducking_cover);
 
     target_unit->apply_damage(normal_with_ducking_cover_camo);
-    target_unit->apply_morale_damage(normal_with_ducking_cover_camo);
+    target_unit->apply_morale_damage(normal_with_ducking_cover_camo, incoming - normal_with_ducking_cover_camo);
   }
 }
 

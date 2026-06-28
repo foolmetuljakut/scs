@@ -12,6 +12,7 @@ UnitGraphPlot::UnitGraphPlot()
     , _create_terrain_camo_selector{0} {
     config.load("./etc/params.cfg");
     _arena->set_hostility(0, 1);
+    _time_values.push_back(0); // call of add_unit will also add the corresponding alive value
 }
 
 UnitGraphPlot::~UnitGraphPlot() {
@@ -44,6 +45,7 @@ void UnitGraphPlot::configure_unit() {
         detailed_unit_config();
     }
 
+    assign_unit_preset_config();
     ImVec2 button_dim(70, 30);
     if(ImGui::Button("Add Unit", button_dim)) {
         add_unit(_create_unit_template._team_id);
@@ -66,6 +68,24 @@ void UnitGraphPlot::basic_unit_config() {
     ImGui::InputInt("Troops total", &_create_unit_template._troops_total);
     ImGui::InputInt("Morale pts total", &_create_unit_template._total_morale);
     ImGui::Checkbox("Show details", &_create_unit_all_params);
+}
+
+void UnitGraphPlot::assign_unit_preset_config() {
+    const char* preset_options[] = { "Prussia 1866 Dreyse Needle", "Austria 1866 Lorenz" };
+
+    ImGui::BeginGroup();
+    ImGui::Combo("Unit preset", &_unit_preset_selector, preset_options, IM_ARRAYSIZE(preset_options));
+    if(ImGui::Button("Assign")) {
+        switch(_unit_preset_selector) {
+        case 0:
+            _create_unit_template = src::unit::UnitParamsFactory::prussia1866();
+        break;
+        case 1:
+            _create_unit_template = src::unit::UnitParamsFactory::austria1866();
+        break;
+        }
+    }
+    ImGui::EndGroup();
 }
 
 void UnitGraphPlot::detailed_unit_config() {

@@ -19,7 +19,7 @@ public:
 
   decltype(UnitParams::_total_morale) total_morale() override;
   decltype(UnitParams::_morale) morale() override;
-  virtual void apply_morale_damage(decltype(UnitParams::_total_morale) incoming_damage) override;
+  virtual void apply_morale_damage(decltype(UnitParams::_morale) incoming_damage, decltype(UnitParams::_morale) suppressed_damage) override;
 
   decltype(UnitParams::_effective_range) effective_range() override;
   decltype(UnitParams::_base_damage_normal) damage_normal() override;

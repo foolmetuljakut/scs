@@ -58,9 +58,12 @@ decltype(UnitParams::_morale) Unit::total_morale() {
     return params._total_morale;
 }
 
-void Unit::apply_morale_damage(decltype(UnitParams::_total_morale) incoming_damage) {
-    incoming_damage = std::min(incoming_damage, params._morale);
-    params._morale -= incoming_damage;
+void Unit::apply_morale_damage(decltype(UnitParams::_morale) incoming_damage, decltype(UnitParams::_morale) suppressed_damage) {
+    int morale_loss_by_kills = static_cast<int>(std::pow(incoming_damage / 5.f, 2.f)); // TODO: 5 / 2 are unconfirmed factors!
+    int morale_loss_by_suppression = static_cast<int>(std::pow(suppressed_damage / 1000.f, 2.f)); // TODO: 1000 / 2 are unconfirmed factors!
+    int morale_damage = std::min(morale_loss_by_kills, params._morale) +
+        std::min(morale_loss_by_suppression, params._morale);
+    params._morale -= morale_damage;
 }
 
 decltype(UnitParams::_effective_range) Unit::effective_range() {
